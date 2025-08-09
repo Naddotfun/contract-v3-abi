@@ -63,8 +63,6 @@ exactOutBuy(ExactOutBuyParams{...})
 exactOutSell(ExactOutSellParams{...})
 ```
 
-## Bot Trading Flow
-
 ### 1. Check Token Status
 
 ```javascript
