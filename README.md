@@ -1,4 +1,4 @@
-# Bot Integration Guide
+# Integration Guide
 
 ## Contract Addresses (Monad Testnet)
 
