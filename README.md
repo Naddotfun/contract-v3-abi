@@ -5,7 +5,7 @@
 ### Monad Testnet
 
 ```
-Lens: 0x9bd553886E1efc8bb9899d17160d92758fCBcDb5
+Lens: 0x143d3A4176F5F21eec5174dDeB4c2090Ae0AE79A
 BondingCurveRouter: 0xA8213c4853ab9101Fa5B06b039ED434266bC2392
 BondingCurve: 0xb9B24593DE375c08c498672001939249b7C5D265
 DexRouter: 0xC849F9a0a906a3bfd837ef1c961f524C69c2376b
@@ -30,27 +30,28 @@ WMON: Coming soon
 
 ### Testnet Parameters
 
-| Parameter                  | Value              | Description                      |
-| -------------------------- | ------------------ | -------------------------------- |
-| Deploy Fee                 | 1 MON              | Fee to create a new token        |
-| Graduate Fee               | 1 MON              | Fee to graduate to DEX           |
-| Virtual MON Reserve        | 30 MON             | Initial virtual MON for pricing  |
-| Virtual Token Reserve      | 1,073,000,191      | Initial virtual token supply     |
-| Target Token Amount        | 279,900,191        | Tokens needed to trigger graduation |
-| Total Token Supply         | 1,000,000,000      | Total supply per token           |
+| Parameter             | Value         | Description                         |
+| --------------------- | ------------- | ----------------------------------- |
+| Deploy Fee            | 1 MON         | Fee to create a new token           |
+| Graduate Fee          | 1 MON         | Fee to graduate to DEX              |
+| Virtual MON Reserve   | 30 MON        | Initial virtual MON for pricing     |
+| Virtual Token Reserve | 1,073,000,191 | Initial virtual token supply        |
+| Target Token Amount   | 279,900,191   | Tokens needed to trigger graduation |
+| Total Token Supply    | 1,000,000,000 | Total supply per token              |
 
 ### Mainnet Parameters
 
-| Parameter                  | Value              | Description                      |
-| -------------------------- | ------------------ | -------------------------------- |
-| Deploy Fee                 | 50 MON (~$3)       | Fee to create a new token        |
-| Graduate Fee               | 3,000 MON          | Fee to graduate to DEX           |
-| Virtual MON Reserve        | 90,000 MON         | Initial virtual MON for pricing  |
-| Virtual Token Reserve      | 1,073,000,191      | Initial virtual token supply     |
-| Target Token Amount        | 279,900,191        | Tokens needed to trigger graduation |
-| Total Token Supply         | 1,000,000,000      | Total supply per token           |
+| Parameter             | Value         | Description                         |
+| --------------------- | ------------- | ----------------------------------- |
+| Deploy Fee            | 50 MON (~$3)  | Fee to create a new token           |
+| Graduate Fee          | 3,000 MON     | Fee to graduate to DEX              |
+| Virtual MON Reserve   | 90,000 MON    | Initial virtual MON for pricing     |
+| Virtual Token Reserve | 1,073,000,191 | Initial virtual token supply        |
+| Target Token Amount   | 279,900,191   | Tokens needed to trigger graduation |
+| Total Token Supply    | 1,000,000,000 | Total supply per token              |
 
 **Key Differences:**
+
 - 🧪 **Testnet**: Lower fees (1 MON) for easier testing
 - 🚀 **Mainnet**: Production fees (50 MON deploy, 3,000 MON graduate)
 
@@ -71,6 +72,12 @@ isLocked(token) → isLocked
 
 // Available tokens to buy (bonding curve only)
 availableBuyTokens(token) → (availableBuyToken, requiredMonAmount)
+
+// Bonding curve progress (basis points: 10000 = 100%)
+getProgress(token) → progress
+
+// Initial buy calculation (before token deployment)
+getInitialBuyAmountOut(amountIn) → amountOut
 ```
 
 **Key Features:**
@@ -81,6 +88,8 @@ availableBuyTokens(token) → (availableBuyToken, requiredMonAmount)
 - ✅ All fees included in calculations
 - ✅ Token status (graduated/locked)
 - ✅ Available supply info
+- ✅ Bonding curve progress tracking
+- ✅ Pre-deployment buy estimation
 
 **Why use Lens?**
 
@@ -227,9 +236,40 @@ if (!isGrad) {
   console.log(`Available: ${ethers.formatEther(available)} tokens`);
   console.log(`Required: ${ethers.formatEther(required)} MON`);
 }
+
+// Get bonding curve progress
+const progress = await lens.getProgress(tokenAddress);
+console.log(`Progress: ${(progress / 100).toFixed(2)}%`); // 5000 → 50.00%
 ```
 
-### 3. Buy Tokens (Recommended Pattern)
+### 3. Initial Buy (Before Token Deployment)
+
+```javascript
+// Calculate expected tokens for initial buy (before token exists)
+const expectedTokens = await lens.getInitialBuyAmountOut(
+  ethers.parseEther("1") // 1 MON
+);
+
+console.log(`You'll receive: ${ethers.formatEther(expectedTokens)} tokens`);
+
+// Use this when creating token with initial buy
+const deployFee = ethers.parseEther("1"); // 1 MON on testnet
+const initialBuyMon = ethers.parseEther("1");
+
+const tx = await bondingCurveRouter.create(
+  {
+    name: "MyToken",
+    symbol: "MTK",
+    tokenURI: "https://example.com/metadata.json",
+    amountOut: expectedTokens, // Use calculated amount
+    salt: ethers.randomBytes(32),
+    actionId: 0,
+  },
+  { value: deployFee + initialBuyMon }
+);
+```
+
+### 4. Buy Tokens (Recommended Pattern)
 
 ```javascript
 // Step 1: Get price from Lens
@@ -266,7 +306,7 @@ if (isBondingCurve) {
 }
 ```
 
-### 4. Sell Tokens
+### 5. Sell Tokens
 
 ```javascript
 // Step 1: Get price from Lens
@@ -302,7 +342,7 @@ if (isBondingCurve) {
 }
 ```
 
-### 5. Exact Output Buy (Want Exact Tokens)
+### 6. Exact Output Buy (Want Exact Tokens)
 
 ```javascript
 // Want exactly 1000 tokens
@@ -340,7 +380,7 @@ if (isBondingCurve) {
 }
 ```
 
-### 6. Sell with Permit (Save Gas)
+### 7. Sell with Permit (Save Gas)
 
 ```javascript
 // Get price from Lens first

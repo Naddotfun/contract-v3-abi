@@ -3,11 +3,7 @@
     "type": "function",
     "name": "availableBuyTokens",
     "inputs": [
-      {
-        "name": "_token",
-        "type": "address",
-        "internalType": "address"
-      }
+      { "name": "_token", "type": "address", "internalType": "address" }
     ],
     "outputs": [
       {
@@ -27,33 +23,13 @@
     "type": "function",
     "name": "getAmountIn",
     "inputs": [
-      {
-        "name": "_token",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "_amountOut",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "_isBuy",
-        "type": "bool",
-        "internalType": "bool"
-      }
+      { "name": "_token", "type": "address", "internalType": "address" },
+      { "name": "_amountOut", "type": "uint256", "internalType": "uint256" },
+      { "name": "_isBuy", "type": "bool", "internalType": "bool" }
     ],
     "outputs": [
-      {
-        "name": "router",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "amountIn",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+      { "name": "router", "type": "address", "internalType": "address" },
+      { "name": "amountIn", "type": "uint256", "internalType": "uint256" }
     ],
     "stateMutability": "view"
   },
@@ -61,33 +37,35 @@
     "type": "function",
     "name": "getAmountOut",
     "inputs": [
-      {
-        "name": "_token",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "_amountIn",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "_isBuy",
-        "type": "bool",
-        "internalType": "bool"
-      }
+      { "name": "_token", "type": "address", "internalType": "address" },
+      { "name": "_amountIn", "type": "uint256", "internalType": "uint256" },
+      { "name": "_isBuy", "type": "bool", "internalType": "bool" }
     ],
     "outputs": [
-      {
-        "name": "router",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "amountOut",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+      { "name": "router", "type": "address", "internalType": "address" },
+      { "name": "amountOut", "type": "uint256", "internalType": "uint256" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getInitialBuyAmountOut",
+    "inputs": [
+      { "name": "_amountIn", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [
+      { "name": "amountOut", "type": "uint256", "internalType": "uint256" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getProgress",
+    "inputs": [
+      { "name": "_token", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [
+      { "name": "progress", "type": "uint256", "internalType": "uint256" }
     ],
     "stateMutability": "view"
   },
@@ -95,18 +73,10 @@
     "type": "function",
     "name": "isGraduated",
     "inputs": [
-      {
-        "name": "_token",
-        "type": "address",
-        "internalType": "address"
-      }
+      { "name": "_token", "type": "address", "internalType": "address" }
     ],
     "outputs": [
-      {
-        "name": "isGraduated",
-        "type": "bool",
-        "internalType": "bool"
-      }
+      { "name": "isGraduated", "type": "bool", "internalType": "bool" }
     ],
     "stateMutability": "view"
   },
@@ -114,19 +84,9 @@
     "type": "function",
     "name": "isLocked",
     "inputs": [
-      {
-        "name": "_token",
-        "type": "address",
-        "internalType": "address"
-      }
+      { "name": "_token", "type": "address", "internalType": "address" }
     ],
-    "outputs": [
-      {
-        "name": "isLocked",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
+    "outputs": [{ "name": "isLocked", "type": "bool", "internalType": "bool" }],
     "stateMutability": "view"
   }
 ]
