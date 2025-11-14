@@ -23,8 +23,8 @@ getAmountOut(token, amountIn, isBuy) → (router, amountOut)
 getAmountIn(token, amountOut, isBuy) → (router, amountIn)
 
 // Token status
-isGraduated(token) → bool
-isLocked(token) → bool
+isGraduated(token) → isGraduated
+isLocked(token) → isLocked
 
 // Available tokens to buy (bonding curve only)
 availableBuyTokens(token) → (availableBuyToken, requiredMonAmount)
@@ -454,21 +454,6 @@ await router.sell({...});
 - `InsufficientOutput` - Slippage too high
 - `InsufficientInput` - Not enough input
 - `InvalidAmountIn/Out` - Invalid amounts
-
----
-
-## 📊 Comparison
-
-| What                   | Old Way                                   | New Way (Lens)              |
-| ---------------------- | ----------------------------------------- | --------------------------- |
-| **Check if graduated** | `bondingCurve.isGraduated()`              | `lens.isGraduated()`        |
-| **Check if locked**    | `bondingCurve.isLocked()`                 | `lens.isLocked()`           |
-| **Available tokens**   | `bondingCurveRouter.availableBuyTokens()` | `lens.availableBuyTokens()` |
-| **Get price**          | Call router's `getAmountOut()`            | `lens.getAmountOut()`       |
-| **Choose router**      | Manual if/else based on status            | Lens returns router         |
-| **Code lines**         | ~15 lines                                 | ~3 lines                    |
-| **Contracts to call**  | 2-3 different contracts                   | 1 contract (Lens)           |
-| **Complexity**         | High (manual logic)                       | Low (automatic)             |
 
 ---
 
