@@ -3,117 +3,571 @@
 ## Contract Addresses (Monad Testnet)
 
 ```
-BondingCurve: 0x52D34d8536350Cd997bCBD0b9E9d722452f341F5
-BondingCurveRouter: 0x4F5A3518F082275edf59026f72B66AC2838c0414
-DexRouter: 0x4FBDC27FAE5f99E7B09590bEc8Bf20481FCf9551
-Factory: 0x961235a9020B05C44DF1026D956D1F4D78014276
+Lens: 0xF8001Ec88A4B7a66A830a04F98c7A6dBeC44C6a1
+BondingCurveRouter: 0x8EfaFCC75C5153091fEcFaD7a0c4B5fBd93Db77B
+BondingCurve: 0x355071F9B75F5Ba090Bc07a6a07Bd35f45070b28
+DexRouter: 0xCD00b0bE0478F7ab9fec0c3c110589361030c7EE
+Factory: 0x961235a9020B05C44DF1026D956D1F4D78014276"
 WMON: 0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701
 ```
 
-## 1️⃣ Token Contract
+---
 
-- Standard ERC20 with permit
-- Check `isListed()` to determine trading venue
+## 🔍 Lens (Price Queries & Token Info)
 
-## 2️⃣ BondingCurve (Direct)
+**Use Lens for ALL read operations - single interface for everything**
 
 ```solidity
-// Read states
-curves(token) → (realMonReserve, realTokenReserve, virtualMonReserve, virtualTokenReserve, k, targetTokenAmount, initVirtualMonReserve, initVirtualTokenReserve)
+// Price queries (automatically detects bonding curve or DEX)
+getAmountOut(token, amountIn, isBuy) → (router, amountOut)
+getAmountIn(token, amountOut, isBuy) → (router, amountIn)
+
+// Token status
+isGraduated(token) → bool
 isLocked(token) → bool
-isListed(token) → bool
 
-
-buy(to, token, amountOut) // Requires exact MON input
-sell(to, token, amountOut) // Requires exact token input
-```
-
-## 3️⃣ BondingCurveRouter (Recommended for Bonding)
-
-```solidity
-// Price queries
-getAmountOut(token, amountIn, is_buy) → amountOut
-getAmountIn(token, amountOut, is_buy) → amountIn
-
-// Buy tokens
-buy(BuyParams{token, amountIn, amountOutMin, to, deadline})
-exactOutBuy(ExactOutBuyParams{token, amountOut, amountInMax, to, deadline})
-
-// Sell tokens
-sell(SellParams{token, amountIn, amountOutMin, to, deadline})
-exactOutSell(ExactOutSellParams{token, amountOut, amountInMax, to, deadline})
-
-// With permit (save gas)
-sellPermit(SellPermitParams{...})
-exactOutSellPermit(ExactOutSellPermitParams{...})
-```
-
-## 4️⃣ DexRouter (After Listing)
-
-```solidity
-// Price queries (uses QuoterV2)
-getAmountOut(token, amountIn, is_buy) → amountOut
-getAmountIn(token, amountOut, is_buy) → amountIn
+// Available tokens to buy (bonding curve only)
 availableBuyTokens(token) → (availableBuyToken, requiredMonAmount)
+```
+
+**Key Features:**
+
+- ✅ Single interface for all queries
+- ✅ Auto-detects bonding curve vs DEX
+- ✅ Returns correct router address
+- ✅ All fees included in calculations
+- ✅ Token status (graduated/locked)
+- ✅ Available supply info
+
+**Why use Lens?**
+
+- All read operations in one place
+- No need to call different contracts
+- Cleaner, simpler code
+- Future-proof (supports new features automatically)
+
+---
+
+## 🛒 BondingCurveRouter (Bonding Curve Trading)
+
+**Focus: Trading before graduation**
+
+```solidity
+// Token creation
+create(TokenCreationParams{name, symbol, tokenURI, amountOut, salt, actionId}) payable → (token, pool)
 
 // Trading
-buy(BuyParams{token, amountOutMin, to, deadline}) payable
-sell(SellParams{token, amountIn, amountOutMin, to, deadline})
-exactOutBuy(ExactOutBuyParams{...})
-exactOutSell(ExactOutSellParams{...})
+buy(BuyParams{amountOutMin, token, to, deadline}) payable
+exactOutBuy(ExactOutBuyParams{amountInMax, amountOut, token, to, deadline}) payable
+sell(SellParams{amountIn, amountOutMin, token, to, deadline})
+exactOutSell(ExactOutSellParams{amountInMax, amountOut, token, to, deadline})
+
+// With permit (gas-saving)
+sellPermit(SellPermitParams{amountIn, amountOutMin, amountAllowance, token, to, deadline, v, r, s})
+exactOutSellPermit(ExactOutSellPermitParams{amountInMax, amountOut, amountAllowance, token, to, deadline, v, r, s})
 ```
 
-### 1. Check Token Status
+---
+
+## 🏦 DexRouter (DEX Trading After Graduation)
+
+**Focus: Trading after graduation**
+
+```solidity
+// Trading
+buy(BuyParams{amountOutMin, token, to, deadline}) payable → amountOut
+exactOutBuy(ExactOutBuyParams{amountInMax, amountOut, token, to, deadline}) payable → amountIn
+sell(SellParams{amountIn, amountOutMin, token, to, deadline}) → amountOut
+exactOutSell(ExactOutSellParams{amountInMax, amountOut, token, to, deadline}) → amountIn
+
+// With permit (gas-saving)
+sellPermit(SellPermitParams{amountIn, amountOutMin, amountAllowance, token, to, deadline, v, r, s}) → amountOut
+exactOutSellPermit(ExactOutSellPermitParams{amountInMax, amountOut, amountAllowance, token, to, deadline, v, r, s}) → amountIn
+```
+
+---
+
+## 📡 Events
+
+### BondingCurve Events
+
+```solidity
+event CurveCreate(
+    address indexed creator,
+    address indexed token,
+    address indexed pool,
+    string name,
+    string symbol,
+    string tokenURI,
+    uint256 virtualMon,
+    uint256 virtualToken,
+    uint256 targetTokenAmount
+);
+
+event CurveBuy(
+    address indexed sender,
+    address indexed token,
+    uint256 amountIn,
+    uint256 amountOut
+);
+
+event CurveSell(
+    address indexed sender,
+    address indexed token,
+    uint256 amountIn,
+    uint256 amountOut
+);
+
+event CurveTokenLocked(
+    address indexed token
+);
+
+event CurveGraduate(
+    address indexed token,
+    address indexed pool
+);
+```
+
+---
+
+## 📚 Integration Examples
+
+### 1. Create Token
 
 ```javascript
-const isListed = await bondingCurve.isListed(tokenAddress);
-const isLocked = await bondingCurve.isLocked(tokenAddress);
+const tx = await bondingCurveRouter.create(
+  {
+    name: "MyToken",
+    symbol: "MTK",
+    tokenURI: "https://example.com/metadata.json",
+    amountOut: ethers.parseEther("1000"), // Initial buy
+    salt: ethers.randomBytes(32),
+    actionId: 0,
+  },
+  { value: ethers.parseEther("0.1") } // Deploy fee + initial buy
+);
 
-if (!isListed && !isLocked) {
-  // Trade on BondingCurveRouter
-} else if (isListed) {
-  // Trade on DexRouter
+const receipt = await tx.wait();
+// Parse CurveCreate event for token address
+```
+
+### 2. Get Price (Using Lens)
+
+```javascript
+// Lens handles everything - bonding curve or DEX
+const [router, amountOut] = await lens.getAmountOut(
+  tokenAddress,
+  ethers.parseEther("1"), // 1 MON input
+  true // isBuy
+);
+
+console.log(`Router to use: ${router}`);
+console.log(`Expected tokens: ${ethers.formatEther(amountOut)}`);
+
+// For selling
+const [routerSell, monOut] = await lens.getAmountOut(
+  tokenAddress,
+  ethers.parseEther("1000"), // 1000 tokens input
+  false // isSell
+);
+
+console.log(`Expected MON: ${ethers.formatEther(monOut)}`);
+
+// Check token status
+const isGrad = await lens.isGraduated(tokenAddress);
+const isLock = await lens.isLocked(tokenAddress);
+console.log(`Graduated: ${isGrad}, Locked: ${isLock}`);
+
+// Check available tokens (bonding curve only)
+if (!isGrad) {
+  const [available, required] = await lens.availableBuyTokens(tokenAddress);
+  console.log(`Available: ${ethers.formatEther(available)} tokens`);
+  console.log(`Required: ${ethers.formatEther(required)} MON`);
 }
 ```
 
-### 2. Get Prices
+### 3. Buy Tokens (Recommended Pattern)
 
 ```javascript
-// BondingCurveRouter
-const amountOut = await bondingCurveRouter.getAmountOut(token, amountIn, true); // buy
-const amountIn = await bondingCurveRouter.getAmountIn(token, amountOut, false); // sell
-const [availableTokens, requiredMon] =
-  await bondingCurveRouter.availableBuyTokens(token);
+// Step 1: Get price from Lens
+const [router, expectedOut] = await lens.getAmountOut(
+  tokenAddress,
+  ethers.parseEther("1"), // 1 MON
+  true
+);
 
-// DexRouter (returns via revert data)
-try {
-  await dexRouter.getAmountOut.staticCall(token, amountIn, true);
-} catch (error) {
-  const amountOut = ethers.AbiCoder.defaultAbiCoder().decode(
-    ["uint256"],
-    error.data
-  )[0];
+// Step 2: Execute on correct router (Lens tells you which one)
+const isBondingCurve = router === bondingCurveRouter.address;
+const minOut = (expectedOut * 99n) / 100n; // 1% slippage
+
+if (isBondingCurve) {
+  await bondingCurveRouter.buy(
+    {
+      amountOutMin: minOut,
+      token: tokenAddress,
+      to: myAddress,
+      deadline: Math.floor(Date.now() / 1000) + 300,
+    },
+    { value: ethers.parseEther("1") }
+  );
+} else {
+  await dexRouter.buy(
+    {
+      amountOutMin: minOut,
+      token: tokenAddress,
+      to: myAddress,
+      deadline: Math.floor(Date.now() / 1000) + 300,
+    },
+    { value: ethers.parseEther("1") }
+  );
 }
 ```
 
-### 3. Execute Trade
+### 4. Sell Tokens
 
 ```javascript
-// Buy on BondingCurveRouter
-await bondingCurveRouter.buy({
-  token: tokenAddress,
-  amountIn: ethers.parseEther("1"),
-  amountOutMin: minTokens,
-  to: myAddress,
-  deadline: Math.floor(Date.now() / 1000) + 300,
+// Step 1: Get price from Lens
+const [router, expectedMon] = await lens.getAmountOut(
+  tokenAddress,
+  ethers.parseEther("1000"), // Selling 1000 tokens
+  false // isSell
+);
+
+// Step 2: Approve tokens to the router Lens returned
+await token.approve(router, ethers.parseEther("1000"));
+
+// Step 3: Execute sell
+const isBondingCurve = router === bondingCurveRouter.address;
+const minMon = (expectedMon * 99n) / 100n; // 1% slippage
+
+if (isBondingCurve) {
+  await bondingCurveRouter.sell({
+    amountIn: ethers.parseEther("1000"),
+    amountOutMin: minMon,
+    token: tokenAddress,
+    to: myAddress,
+    deadline: Math.floor(Date.now() / 1000) + 300,
+  });
+} else {
+  await dexRouter.sell({
+    amountIn: ethers.parseEther("1000"),
+    amountOutMin: minMon,
+    token: tokenAddress,
+    to: myAddress,
+    deadline: Math.floor(Date.now() / 1000) + 300,
+  });
+}
+```
+
+### 5. Exact Output Buy (Want Exact Tokens)
+
+```javascript
+// Want exactly 1000 tokens
+const [router, requiredMon] = await lens.getAmountIn(
+  tokenAddress,
+  ethers.parseEther("1000"), // Exact tokens wanted
+  true
+);
+
+const isBondingCurve = router === bondingCurveRouter.address;
+const maxMon = (requiredMon * 101n) / 100n; // 1% slippage
+
+if (isBondingCurve) {
+  await bondingCurveRouter.exactOutBuy(
+    {
+      amountInMax: maxMon,
+      amountOut: ethers.parseEther("1000"),
+      token: tokenAddress,
+      to: myAddress,
+      deadline: Math.floor(Date.now() / 1000) + 300,
+    },
+    { value: maxMon }
+  );
+} else {
+  await dexRouter.exactOutBuy(
+    {
+      amountInMax: maxMon,
+      amountOut: ethers.parseEther("1000"),
+      token: tokenAddress,
+      to: myAddress,
+      deadline: Math.floor(Date.now() / 1000) + 300,
+    },
+    { value: maxMon }
+  );
+}
+```
+
+### 6. Sell with Permit (Save Gas)
+
+```javascript
+// Get price from Lens first
+const [router, expectedMon] = await lens.getAmountOut(
+  tokenAddress,
+  ethers.parseEther("1000"),
+  false
+);
+
+// Get permit signature
+const deadline = Math.floor(Date.now() / 1000) + 3600;
+const { v, r, s } = await getPermitSignature(
+  token,
+  owner,
+  router, // Use router from Lens
+  ethers.parseEther("1000"),
+  deadline
+);
+
+// Sell with permit (no approve tx needed!)
+const isBondingCurve = router === bondingCurveRouter.address;
+
+if (isBondingCurve) {
+  await bondingCurveRouter.sellPermit({
+    amountIn: ethers.parseEther("1000"),
+    amountOutMin: (expectedMon * 99n) / 100n,
+    amountAllowance: ethers.parseEther("1000"),
+    token: tokenAddress,
+    to: myAddress,
+    deadline: deadline,
+    v,
+    r,
+    s,
+  });
+} else {
+  await dexRouter.sellPermit({
+    amountIn: ethers.parseEther("1000"),
+    amountOutMin: (expectedMon * 99n) / 100n,
+    amountAllowance: ethers.parseEther("1000"),
+    token: tokenAddress,
+    to: myAddress,
+    deadline: deadline,
+    v,
+    r,
+    s,
+  });
+}
+```
+
+### 7. Listen to Events
+
+```javascript
+// Token creation
+bondingCurve.on("CurveCreate", (creator, token, pool, name, symbol) => {
+  console.log(`New token: ${name} (${symbol}) at ${token}`);
 });
 
-// Sell on DexRouter
-await dexRouter.sell({
-  token: tokenAddress,
-  amountIn: tokenAmount,
-  amountOutMin: minMON,
-  to: myAddress,
-  deadline: Math.floor(Date.now() / 1000) + 300,
+// Buy/Sell on bonding curve
+bondingCurve.on("CurveBuy", (sender, token, amountIn, amountOut) => {
+  console.log(
+    `Buy: ${ethers.formatEther(amountIn)} MON → ${ethers.formatEther(
+      amountOut
+    )} tokens`
+  );
 });
+
+// Token locked (target reached)
+bondingCurve.on("CurveTokenLocked", (token) => {
+  console.log(`Token locked: ${token}`);
+});
+
+// Graduation
+bondingCurve.on("CurveGraduate", (token, pool) => {
+  console.log(`Token graduated: ${token}, Pool: ${pool}`);
+});
+
+// DEX trades
+dexRouter.on("DexRouterBuy", (sender, token, amountIn, amountOut) => {
+  console.log(`DEX Buy: ${ethers.formatEther(amountIn)} MON`);
+});
+
+// Query past events
+const filter = bondingCurve.filters.CurveCreate(null, tokenAddress);
+const events = await bondingCurve.queryFilter(filter, fromBlock, toBlock);
+```
+
+---
+
+## 🏗️ Architecture
+
+```
+┌──────────────────────────┐
+│    User / Frontend       │
+└────────────┬─────────────┘
+             │
+             ↓
+┌────────────────────────────┐
+│   Lens (All Queries)       │ ← Use this for everything!
+│  - getAmountOut()          │
+│  - getAmountIn()           │
+│  → Returns router + amount │
+└────────────┬───────────────┘
+             │
+    ┌────────┴────────┐
+    ↓                 ↓
+┌─────────────┐  ┌─────────────┐
+│BondingCurve │  │  DexRouter  │
+│   Router    │  │             │
+│ (Pre-Grad)  │  │ (Post-Grad) │
+└─────────────┘  └─────────────┘
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Always Use Lens for Queries
+
+```javascript
+// ✅ Good - Use Lens
+const [router, amount] = await lens.getAmountOut(token, input, isBuy);
+
+// ❌ Bad - Don't call routers directly for prices
+const amount = await bondingCurveRouter.getAmountOutWithFee(...); // Don't do this
+```
+
+### 2. Use Lens for Token Status
+
+```javascript
+// ✅ Good - Use Lens for all status checks
+const isGrad = await lens.isGraduated(token);
+const isLock = await lens.isLocked(token);
+const [available, required] = await lens.availableBuyTokens(token);
+
+// ❌ Bad - Don't call BondingCurve directly
+const isGrad = await bondingCurve.isGraduated(token); // Don't do this
+```
+
+### 3. Let Lens Choose the Router
+
+```javascript
+// ✅ Good - Lens returns correct router
+const [router, price] = await lens.getAmountOut(...);
+if (router === bondingCurveRouter.address) { /* use bonding curve */ }
+
+// ❌ Bad - Manual selection based on status
+const isGrad = await lens.isGraduated(token);
+if (isGrad) { /* manually choose dex */ } // Less optimal
+```
+
+### 4. Calculate Slippage Properly
+
+```javascript
+// ✅ Good - Use bigint math
+const minOut = (expectedOut * 99n) / 100n; // 1% slippage
+
+// ❌ Bad - Floating point (precision loss)
+const minOut = expectedOut * 0.99; // Don't do this
+```
+
+### 5. Use Permit to Save Gas
+
+```javascript
+// ✅ Good - One transaction (permit + sell)
+await router.sellPermit({...});
+
+// ❌ Acceptable but costs more gas - Two transactions
+await token.approve(router, amount);
+await router.sell({...});
+```
+
+---
+
+## 🚨 Error Handling
+
+### Lens
+
+- No errors (pure view function)
+
+### BondingCurveRouter
+
+- `DeadlineExpired` - Transaction took too long
+- `InsufficientAmountOut` - Slippage too high
+- `InsufficientAmountInMax` - Max input exceeded
+- `InsufficientMon` - Not enough MON sent
+- `InvalidAllowance` - Invalid permit signature
+
+### DexRouter
+
+- `ExpiredDeadLine` - Transaction took too long
+- `InsufficientOutput` - Slippage too high
+- `InsufficientInput` - Not enough input
+- `InvalidAmountIn/Out` - Invalid amounts
+
+---
+
+## 📊 Comparison
+
+| What                   | Old Way                                   | New Way (Lens)              |
+| ---------------------- | ----------------------------------------- | --------------------------- |
+| **Check if graduated** | `bondingCurve.isGraduated()`              | `lens.isGraduated()`        |
+| **Check if locked**    | `bondingCurve.isLocked()`                 | `lens.isLocked()`           |
+| **Available tokens**   | `bondingCurveRouter.availableBuyTokens()` | `lens.availableBuyTokens()` |
+| **Get price**          | Call router's `getAmountOut()`            | `lens.getAmountOut()`       |
+| **Choose router**      | Manual if/else based on status            | Lens returns router         |
+| **Code lines**         | ~15 lines                                 | ~3 lines                    |
+| **Contracts to call**  | 2-3 different contracts                   | 1 contract (Lens)           |
+| **Complexity**         | High (manual logic)                       | Low (automatic)             |
+
+---
+
+## 💡 Summary
+
+**Before Lens:**
+
+```javascript
+// Check graduation
+const isGrad = await bondingCurve.isGraduated(token);
+
+// Get price from correct router
+let price;
+if (isGrad) {
+  price = await dexRouter.getAmountOut(...);
+} else {
+  price = await bondingCurveRouter.getAmountOutWithFee(...);
+}
+
+// Execute on correct router
+if (isGrad) {
+  await dexRouter.buy(...);
+} else {
+  await bondingCurveRouter.buy(...);
+}
+```
+
+**With Lens (Now):**
+
+```javascript
+// Get price AND router in one call
+const [router, price] = await lens.getAmountOut(token, input, true);
+
+// Execute on router returned by Lens
+if (router === bondingCurveRouter.address) {
+  await bondingCurveRouter.buy(...);
+} else {
+  await dexRouter.buy(...);
+}
+```
+
+**Even Better - Helper Function:**
+
+```javascript
+async function buy(token, monAmount) {
+  const [router, expectedOut] = await lens.getAmountOut(token, monAmount, true);
+  const minOut = (expectedOut * 99n) / 100n;
+
+  const routerContract =
+    router === bondingCurveRouter.address ? bondingCurveRouter : dexRouter;
+
+  return routerContract.buy(
+    {
+      amountOutMin: minOut,
+      token,
+      to: myAddress,
+      deadline: Math.floor(Date.now() / 1000) + 300,
+    },
+    { value: monAmount }
+  );
+}
+
+// Usage - super simple!
+await buy(tokenAddress, ethers.parseEther("1"));
 ```
