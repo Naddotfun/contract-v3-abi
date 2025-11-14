@@ -1,6 +1,8 @@
 # Integration Guide
 
-## Contract Addresses (Monad Testnet)
+## Contract Addresses
+
+### Monad Testnet
 
 ```
 Lens: 0x9bd553886E1efc8bb9899d17160d92758fCBcDb5
@@ -10,6 +12,47 @@ DexRouter: 0xC849F9a0a906a3bfd837ef1c961f524C69c2376b
 Factory: 0x961235a9020B05C44DF1026D956D1F4D78014276
 WMON: 0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701
 ```
+
+### Monad Mainnet
+
+```
+Lens: Coming soon
+BondingCurveRouter: Coming soon
+BondingCurve: Coming soon
+DexRouter: Coming soon
+Factory: Coming soon
+WMON: Coming soon
+```
+
+---
+
+## ⚙️ Network Configuration
+
+### Testnet Parameters
+
+| Parameter                  | Value              | Description                      |
+| -------------------------- | ------------------ | -------------------------------- |
+| Deploy Fee                 | 1 MON              | Fee to create a new token        |
+| Graduate Fee               | 1 MON              | Fee to graduate to DEX           |
+| Virtual MON Reserve        | 30 MON             | Initial virtual MON for pricing  |
+| Virtual Token Reserve      | 1,073,000,191      | Initial virtual token supply     |
+| Target Token Amount        | 279,900,191        | Tokens needed to trigger graduation |
+| Total Token Supply         | 1,000,000,000      | Total supply per token           |
+
+### Mainnet Parameters
+
+| Parameter                  | Value              | Description                      |
+| -------------------------- | ------------------ | -------------------------------- |
+| Deploy Fee                 | 50 MON (~$3)       | Fee to create a new token        |
+| Graduate Fee               | 3,000 MON          | Fee to graduate to DEX           |
+| Virtual MON Reserve        | 90,000 MON         | Initial virtual MON for pricing  |
+| Virtual Token Reserve      | 1,073,000,191      | Initial virtual token supply     |
+| Target Token Amount        | 279,900,191        | Tokens needed to trigger graduation |
+| Total Token Supply         | 1,000,000,000      | Total supply per token           |
+
+**Key Differences:**
+- 🧪 **Testnet**: Lower fees (1 MON) for easier testing
+- 🚀 **Mainnet**: Production fees (50 MON deploy, 3,000 MON graduate)
 
 ---
 
