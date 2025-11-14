@@ -3,11 +3,11 @@
 ## Contract Addresses (Monad Testnet)
 
 ```
-Lens: 0xF8001Ec88A4B7a66A830a04F98c7A6dBeC44C6a1
-BondingCurveRouter: 0x8EfaFCC75C5153091fEcFaD7a0c4B5fBd93Db77B
-BondingCurve: 0x355071F9B75F5Ba090Bc07a6a07Bd35f45070b28
-DexRouter: 0xCD00b0bE0478F7ab9fec0c3c110589361030c7EE
-Factory: 0x961235a9020B05C44DF1026D956D1F4D78014276"
+Lens: 0x9bd553886E1efc8bb9899d17160d92758fCBcDb5
+BondingCurveRouter: 0xA8213c4853ab9101Fa5B06b039ED434266bC2392
+BondingCurve: 0xb9B24593DE375c08c498672001939249b7C5D265
+DexRouter: 0xC849F9a0a906a3bfd837ef1c961f524C69c2376b
+Factory: 0x961235a9020B05C44DF1026D956D1F4D78014276
 WMON: 0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701
 ```
 
@@ -345,43 +345,6 @@ if (isBondingCurve) {
     s,
   });
 }
-```
-
-### 7. Listen to Events
-
-```javascript
-// Token creation
-bondingCurve.on("CurveCreate", (creator, token, pool, name, symbol) => {
-  console.log(`New token: ${name} (${symbol}) at ${token}`);
-});
-
-// Buy/Sell on bonding curve
-bondingCurve.on("CurveBuy", (sender, token, amountIn, amountOut) => {
-  console.log(
-    `Buy: ${ethers.formatEther(amountIn)} MON → ${ethers.formatEther(
-      amountOut
-    )} tokens`
-  );
-});
-
-// Token locked (target reached)
-bondingCurve.on("CurveTokenLocked", (token) => {
-  console.log(`Token locked: ${token}`);
-});
-
-// Graduation
-bondingCurve.on("CurveGraduate", (token, pool) => {
-  console.log(`Token graduated: ${token}, Pool: ${pool}`);
-});
-
-// DEX trades
-dexRouter.on("DexRouterBuy", (sender, token, amountIn, amountOut) => {
-  console.log(`DEX Buy: ${ethers.formatEther(amountIn)} MON`);
-});
-
-// Query past events
-const filter = bondingCurve.filters.CurveCreate(null, tokenAddress);
-const events = await bondingCurve.queryFilter(filter, fromBlock, toBlock);
 ```
 
 ---
