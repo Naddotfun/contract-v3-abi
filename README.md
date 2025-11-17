@@ -56,9 +56,9 @@ TOKEN_IMPLEMENT: 0xaF84C7e1737540e6E30731D2e547a006F40b0C1c
 
 | Parameter             | Value         | Description                         |
 | --------------------- | ------------- | ----------------------------------- |
-| Deploy Fee            | 1 MON         | Fee to create a new token           |
-| Graduate Fee          | 1 MON         | Fee to graduate to DEX              |
-| Virtual MON Reserve   | 30 MON        | Initial virtual MON for pricing     |
+| Deploy Fee            | 50 MON        | Fee to create a new token           |
+| Graduate Fee          | 3,000 MON     | Fee to graduate to DEX              |
+| Virtual MON Reserve   | 90,000 MON    | Initial virtual MON for pricing     |
 | Virtual Token Reserve | 1,073,000,191 | Initial virtual token supply        |
 | Target Token Amount   | 279,900,191   | Tokens needed to trigger graduation |
 | Total Token Supply    | 1,000,000,000 | Total supply per token              |
