@@ -167,42 +167,94 @@ exactOutSellPermit(ExactOutSellPermitParams{amountInMax, amountOut, amountAllowa
 
 ### BondingCurve Events
 
+## 1. CurveCreate
 ```solidity
-event CurveCreate(
-    address indexed creator,
-    address indexed token,
-    address indexed pool,
-    string name,
-    string symbol,
-    string tokenURI,
-    uint256 virtualMon,
-    uint256 virtualToken,
-    uint256 targetTokenAmount
-);
-
-event CurveBuy(
-    address indexed sender,
-    address indexed token,
-    uint256 amountIn,
-    uint256 amountOut
-);
-
-event CurveSell(
-    address indexed sender,
-    address indexed token,
-    uint256 amountIn,
-    uint256 amountOut
-);
-
-event CurveTokenLocked(
-    address indexed token
-);
-
-event CurveGraduate(
-    address indexed token,
-    address indexed pool
+emit CurveCreate(
+    params.creator,
+    token,
+    pool,
+    params.name,
+    params.symbol,
+    params.tokenURI,
+    _config.virtualMonReserve,
+    _config.virtualTokenReserve,
+    _config.targetTokenAmount
 );
 ```
+
+- **When emitted**: When a new token is created
+- **Meaning**: A new token with a bonding curve has been created
+- **Included information**: Creator address, token address, pool address, token info (name, symbol, URI), initial virtual reserves, target token amount
+
+---
+
+## 2. CurveBuy
+```solidity
+emit CurveBuy(to, token, actualAmountIn, effectiveAmountOut);
+```
+
+- **When emitted**: When a user buys tokens
+- **Meaning**: A token purchase has occurred on the bonding curve
+- **Included information**: Recipient address, token address, actual wMon amount deposited, actual token amount received
+
+---
+
+## 3. CurveSell
+```solidity
+emit CurveSell(to, token, actualAmountIn, effectiveAmountOut);
+```
+
+- **When emitted**: When a user sells tokens
+- **Meaning**: A token sale has occurred on the bonding curve
+- **Included information**: Recipient address, token address, token amount sold, actual Mon amount received (after fees)
+
+---
+
+## 4. CurveSync
+```solidity
+emit CurveSync(
+    token,
+    curve.realMonReserve,
+    curve.realTokenReserve,
+    curve.virtualMonReserve,
+    curve.virtualTokenReserve
+);
+```
+
+- **When emitted**: After each buy/sell when the bonding curve state is updated
+- **Meaning**: Synchronizes the current reserve state of the bonding curve
+- **Included information**: Token address, real Mon reserve, real token reserve, virtual Mon reserve, virtual token reserve
+
+---
+
+## 5. CurveTokenLocked
+```solidity
+emit CurveTokenLocked(token);
+```
+
+- **When emitted**: When the token's virtual reserve reaches the target amount (targetTokenAmount)
+- **Meaning**: The bonding curve is locked and no more buys/sells are possible. Now entering the DEX listing preparation phase
+- **Included information**: Locked token address
+
+---
+
+## 6. CurveGraduate
+```solidity
+emit CurveGraduate(token, pool);
+```
+
+- **When emitted**: When a locked token is officially listed on the DEX (Uniswap V3)
+- **Meaning**: Graduated from the bonding curve and liquidity has been transferred to the DEX
+- **Included information**: Token address, DEX pool address
+
+---
+
+## Overall Flow Summary
+
+1. **Create** → Token creation
+2. **Buy/Sell** → Trading on the bonding curve (Sync event emitted after each trade)
+3. **Locked** → Bonding curve locked when target is reached
+4. **Graduated** → Liquidity migration to DEX completed
 
 ---
 
