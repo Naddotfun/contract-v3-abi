@@ -65,6 +65,19 @@ TOKEN_IMPLEMENT: 0xEDc927B974F9964bba538bbD508F658d11917b43
 
 ### Mainnet Parameters
 
+**Until Monad Public Launch (Current Settings):**
+
+| Parameter             | Value         | Description                         |
+| --------------------- | ------------- | ----------------------------------- |
+| Deploy Fee            | 0.0005 MON    | Fee to create a new token           |
+| Graduate Fee          | 0.03 MON      | Fee to graduate to DEX              |
+| Virtual MON Reserve   | 0.9 MON       | Initial virtual MON for pricing     |
+| Virtual Token Reserve | 1,073,000,191 | Initial virtual token supply        |
+| Target Token Amount   | 279,900,191   | Tokens needed to trigger graduation |
+| Total Token Supply    | 1,000,000,000 | Total supply per token              |
+
+**After Monad Public Launch (Future Settings):**
+
 | Parameter             | Value         | Description                         |
 | --------------------- | ------------- | ----------------------------------- |
 | Deploy Fee            | 50 MON        | Fee to create a new token           |
@@ -77,7 +90,8 @@ TOKEN_IMPLEMENT: 0xEDc927B974F9964bba538bbD508F658d11917b43
 **Key Differences:**
 
 - 🧪 **Testnet**: Lower fees (1 MON) for easier testing
-- 🚀 **Mainnet**: Production fees (50 MON deploy, 3,000 MON graduate) - Until Monad Public is released, 0.01 MON
+- 🚀 **Mainnet (Pre-Public)**: Very low fees (0.0005 MON deploy, 0.03 MON graduate) for initial launch period
+- 🚀 **Mainnet (Post-Public)**: Production fees (50 MON deploy, 3,000 MON graduate)
 
 ---
 
