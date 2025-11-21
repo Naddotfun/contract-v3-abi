@@ -5,7 +5,7 @@
 ### Monad Mainnet
 
 ```
-DEX_FACTORY: 0xE6dc50f36E26bAfC5f103021e01EF111402Cd940
+DEX_FACTORY: 0x6B5F564339DbAD6b780249827f2198a841FEB7F3
 WMON: 0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A
 BONDING_CURVE_ROUTER: 0x84202FD46851B4a9Da9Ab3100Dd459Bf1F0a3dC0
 BONDING_CURVE: 0x7193E46d4a812c8990F96A6E9c1f1ed338b2a6b7
@@ -56,7 +56,7 @@ LENS: 0x1b2b500a6f6C8a25Ca0436d8183Ba25C9415e28E
 
 | Parameter             | Value         | Description                         |
 | --------------------- | ------------- | ----------------------------------- |
-| Deploy Fee            | 50 MON        | Fee to create a new token           |
+| Deploy Fee            | 10 MON        | Fee to create a new token           |
 | Graduate Fee          | 3,000 MON     | Fee to graduate to DEX              |
 | Virtual MON Reserve   | 90,000 MON    | Initial virtual MON for pricing     |
 | Virtual Token Reserve | 1,073,000,191 | Initial virtual token supply        |
