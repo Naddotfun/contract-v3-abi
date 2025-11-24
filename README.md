@@ -28,29 +28,7 @@ LENS: 0x1b2b500a6f6C8a25Ca0436d8183Ba25C9415e28E
 
 ## ⚙️ Network Configuration
 
-### Testnet Parameters
-
-| Parameter             | Value         | Description                         |
-| --------------------- | ------------- | ----------------------------------- |
-| Deploy Fee            | 50 MON        | Fee to create a new token           |
-| Graduate Fee          | 3,000 MON     | Fee to graduate to DEX              |
-| Virtual MON Reserve   | 90,000 MON    | Initial virtual MON for pricing     |
-| Virtual Token Reserve | 1,073,000,191 | Initial virtual token supply        |
-| Target Token Amount   | 279,900,191   | Tokens needed to trigger graduation |
-| Total Token Supply    | 1,000,000,000 | Total supply per token              |
-
 ### Mainnet Parameters
-
-**Until Monad Public Launch (Current Settings):**
-
-| Parameter             | Value         | Description                         |
-| --------------------- | ------------- | ----------------------------------- |
-| Deploy Fee            | 0.0005 MON    | Fee to create a new token           |
-| Graduate Fee          | 0.03 MON      | Fee to graduate to DEX              |
-| Virtual MON Reserve   | 0.9 MON       | Initial virtual MON for pricing     |
-| Virtual Token Reserve | 1,073,000,191 | Initial virtual token supply        |
-| Target Token Amount   | 279,900,191   | Tokens needed to trigger graduation |
-| Total Token Supply    | 1,000,000,000 | Total supply per token              |
 
 **After Monad Public Launch (Future Settings):**
 
@@ -62,12 +40,6 @@ LENS: 0x1b2b500a6f6C8a25Ca0436d8183Ba25C9415e28E
 | Virtual Token Reserve | 1,073,000,191 | Initial virtual token supply        |
 | Target Token Amount   | 279,900,191   | Tokens needed to trigger graduation |
 | Total Token Supply    | 1,000,000,000 | Total supply per token              |
-
-**Key Differences:**
-
-- 🧪 **Testnet**: Lower fees (1 MON) for easier testing
-- 🚀 **Mainnet (Pre-Public)**: Very low fees (0.0005 MON deploy, 0.03 MON graduate) for initial launch period
-- 🚀 **Mainnet (Post-Public)**: Production fees (50 MON deploy, 3,000 MON graduate)
 
 ---
 
