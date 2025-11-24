@@ -211,7 +211,7 @@ emit CurveTokenLocked(token);
 emit CurveGraduate(token, pool);
 ```
 
-- **When emitted**: When a locked token is officially listed on the DEX (Uniswap V3)
+- **When emitted**: When a locked token is officially listed on the DEX (Capricorn V3)
 - **Meaning**: Graduated from the bonding curve and liquidity has been transferred to the DEX
 - **Included information**: Token address, DEX pool address
 
