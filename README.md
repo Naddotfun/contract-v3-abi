@@ -25,7 +25,7 @@ LENS: 0x7e78A8DE94f21804F7a17F4E8BF9EC2c872187ea
 | --------------------- | ------------- | ----------------------------------- |
 | Deploy Fee            | 10 MON        | Fee to create a new token           |
 | Graduate Fee          | 7,500 MON     | Fee to graduate to DEX              |
-| Virtual MON Reserve   | 255,000 MON   | Initial virtual MON for pricing     |
+| Virtual MON Reserve   | 225,000 MON   | Initial virtual MON for pricing     |
 | Virtual Token Reserve | 1,073,000,191 | Initial virtual token supply        |
 | Target Token Amount   | 279,900,191   | Tokens needed to trigger graduation |
 | Total Token Supply    | 1,000,000,000 | Total supply per token              |
